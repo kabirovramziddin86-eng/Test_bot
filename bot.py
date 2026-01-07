@@ -1,18 +1,24 @@
-import asyncio
-from aiogram import Bot, Dispatcher
+import telebot
 import os
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = os.environ.get("BOT_TOKEN")
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
+if not TOKEN:
+    print("BOT_TOKEN topilmadi")
+    exit(1)
 
-@dp.message()
-async def echo(message):
-    await message.answer("Bot Render’da ishlayapti ✅")
+bot = telebot.TeleBot(TOKEN)
 
-async def main():
-    await dp.start_polling(bot)
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.reply_to(
+        message,
+        "Salom 👋\nQanday yordam bera olaman?"
+    )
 
-if __name__ == "__main__":
-    asyncio.run(main())
+@bot.message_handler(func=lambda message: True)
+def echo(message):
+    bot.reply_to(message, message.text)
+
+print("Bot ishga tushdi...")
+bot.infinity_polling()
